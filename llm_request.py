@@ -4,7 +4,7 @@ import json
 # Configure the local LLM endpoint
 endpoint = "127.0.0.1:11434"
 
-# Definir o prompt
+# Define a prompt
 question = f"""Rochas são agregados sólidos e naturais, estudados num ramo da Geologia chamado de
 Petrologia. De acordo com a composição, os materiais formadores de rochas são, EXCETO"""
 correct_answer = f"""Gases"""
@@ -26,7 +26,14 @@ Resposta escolhida: {choosen_answer}"""
 conn = http.client.HTTPConnection(endpoint)
 
 # Define the request body
-body = json.dumps({"model": "deepseek-r1:8b", "prompt": prompt, "stream": False})  # Deactivate streaming
+body = json.dumps({ 
+    "model": "deepseek-r1:8b",
+    "prompt": prompt,
+    "stream": False,
+    # "options": {
+    #     "temperature": 0.75,
+    # }
+})  # Deactivate streaming
 
 # Send the POST request to the /api/generate endpoint
 headers = {'Content-Type': 'application/json'}
