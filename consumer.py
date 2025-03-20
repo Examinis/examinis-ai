@@ -30,13 +30,12 @@ logger.info(f"Conectando ao RabbitMQ em {rabbitmq_host}:{rabbitmq_port}")
 
 def process_ollama_query(question_text, correct_answer, choosen_answer):
     """Processa a consulta no Ollama e retorna a resposta"""
-    prompt = f"""Vou lhe passar uma questão, junto com a resposta certa dessa questão e a resposta que escolhi. 
-Caso tenha acertado, explique o porquê de estar certa. 
-Caso tenha errado, explique o raciocínio correto para chegar na resposta certa. 
+    prompt = f"""Vou lhe passar uma questão que respondi errado, junto com a resposta certa dessa questão e a resposta que escolhi. 
+Explique o raciocínio correto para chegar na resposta certa. 
 Seja o mais breve possível em sua resposta! 
 Em hipótese alguma me mencione na resposta!!! 
 Escreva de uma forma impessoal, de forma alguma devolva respostas como "Vamos começar pela análise da resposta incorreta"!!! 
-Lembre-se que eu terei acertado apenas se a resposta certa for igual a resoposta escolhida, caso contrário sempre trate a resposta escolhida como errada! 
+Lembre-se que eu terei acertado apenas se a resposta certa for igual a resposta escolhida, caso contrário sempre trate a resposta escolhida como errada! 
 Questão: {question_text} 
 Resposta certa: {correct_answer} 
 Resposta escolhida: {choosen_answer}"""
@@ -64,7 +63,7 @@ Resposta escolhida: {choosen_answer}"""
         data = json.loads(response_body)
         
         if "response" in data:
-            logger.info(f"Resposta do LLM: {data['response']}")
+            logger.info(f"Resposta do LLM: {data['response'].split("</think>")[1]}")
             return data["response"]
         else:
             logger.error(f"Erro: Resposta inesperada do LLM: {data}")
@@ -88,12 +87,12 @@ def callback(ch, method, properties, body):
         id_exam = payload.get('id_exam')
         id_question = payload.get('id_question')
         question_text = payload.get('question_text')
-        option_escolhida = payload.get('option_escolhida')
-        option_correta = payload.get('option_correta')
+        choosen_option = payload.get('choosen_option')
+        correct_option = payload.get('correct_option')
         user_id = payload.get('user_id')
         
         # Processar a consulta com o modelo Ollama
-        feedback = process_ollama_query(question_text, option_correta, option_escolhida)
+        feedback = process_ollama_query(question_text, correct_option, choosen_option)
         
         # Preparar resposta
         response_payload = {
