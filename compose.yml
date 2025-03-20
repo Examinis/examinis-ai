@@ -9,28 +9,35 @@ services:
     networks:
       - examinis-network
     restart: unless-stopped
+    tty: true
+    stdin_open: true
 
   python-client:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    build: .
     container_name: examinis-python
+    volumes:
+    - ./:/app 
     depends_on:
       - ollama
     networks:
       - examinis-network
-    volumes:
-      - ./app:/app
+      - examinis_ai_network
     environment:
       - OLLAMA_HOST=ollama
       - OLLAMA_PORT=11434
-    # Garantir que a saída do stdout seja visível
-    tty: true
-    stdin_open: true
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_USER=guest
+      - RABBITMQ_PASS=guest
+      - RABBITMQ_PORT=5672
+      - QUEUE_NAME=ai.feedback.requests
+      - RESPONSE_EXCHANGE=examinis
+    restart: unless-stopped
 
 networks:
   examinis-network:
     driver: bridge
+  examinis_ai_network:
+    external: true
 
 volumes:
   ollama_data:

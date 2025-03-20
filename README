@@ -11,8 +11,3 @@ docker-compose up -d
 ```
 docker exec -it examinis-ai ollama pull deepseek-r1:1.5b
 ```
-
-4. Em seguida, você pode executar o script Python:
-```
-docker-compose run python-client
-```
