@@ -1,0 +1,48 @@
+version: "3.9"
+
+services:
+  ollama1:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: examinis-ai-1
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data1:/root/.ollama
+    networks:
+      - examinis_ai_network
+
+  ollama2:
+    build:
+      context: .
+      dockerfile: Dockerfile.ollama
+    container_name: examinis-ai-2
+    ports:
+      - "11435:11434"
+    volumes:
+      - ollama_data2:/root/.ollama
+    networks:
+      - examinis_ai_network
+
+  consumer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: examinis-consumer
+    depends_on:
+      - ollama1
+      - ollama2
+    environment:
+      - RABBITMQ_HOST=examinis-rabbitmq
+      - OLLAMA_SERVERS=ollama1:11434,ollama2:11435
+    networks:
+      - examinis_ai_network
+
+volumes:
+  ollama_data1:
+  ollama_data2:
+
+networks:
+  examinis_ai_network:
+    external: true

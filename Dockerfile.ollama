@@ -1,0 +1,14 @@
+FROM ollama/ollama
+
+# Start Ollama server temporarily
+RUN mkdir -p /root/.ollama && \
+    ollama serve & \
+    # Wait for server to start
+    sleep 5 && \
+    # Pull the model
+    ollama pull deepseek-r1:1.5b && \
+    # Kill the temporary server
+    pkill ollama
+
+# Start Ollama server when container runs
+CMD ["ollama", "serve"]
