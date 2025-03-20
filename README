@@ -1,0 +1,18 @@
+1. Execute o Docker Compose:
+```
+docker-compose up -d
+```
+
+2. O Docker Compose iniciará dois serviços:
+   - Ollama: executa o modelo DeepSeek
+   - Python-client: executa seu script
+
+3. A primeira vez que rodar, você precisará baixar o modelo DeepSeek:
+```
+docker exec -it examinis-ai ollama pull deepseek-r1:1.5b
+```
+
+4. Em seguida, você pode executar o script Python:
+```
+docker-compose run python-client
+```

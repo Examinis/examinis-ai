@@ -1,0 +1,36 @@
+services:
+  ollama:
+    image: ollama/ollama
+    container_name: examinis-ai
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    networks:
+      - examinis-network
+    restart: unless-stopped
+
+  python-client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: examinis-python
+    depends_on:
+      - ollama
+    networks:
+      - examinis-network
+    volumes:
+      - ./app:/app
+    environment:
+      - OLLAMA_HOST=ollama
+      - OLLAMA_PORT=11434
+    # Garantir que a saída do stdout seja visível
+    tty: true
+    stdin_open: true
+
+networks:
+  examinis-network:
+    driver: bridge
+
+volumes:
+  ollama_data:
